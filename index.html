@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        .box{
+            width: 310px;
+            height: 250px;
+            margin:100px auto;
+            position: relative;
+            overflow: hidden;
+        }
+        .box .slider{
+            width: 600%;
+            height:220px;
+        }
+        .box .slider .slider-img{
+            float: left;
+            position: absolute;
+        }
+
+        .box .slider-ctrl .next {
+            position: absolute;
+            right: 0px;
+            top: 40%;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .box .slider-ctrl .prev {
+            position: absolute;
+            left: 0px;
+            top: 40%;
+            color: #fff;
+            cursor: pointer;
+        }
+        .box .slider-ctrl .inder {
+            display: inline-block;
+            width: 40px;
+            height: 6px;
+            background-color: #cccccc;
+            margin-top: 10px;
+            margin-left: 10px;
+            text-indent: -60px;
+            overflow: hidden;
+        }
+
+        .box .slider-ctrl .inder.cur{
+            background: red;
+        }
+    </style>
+</head>
+<body>
+<div class="box" id="box_js">
+    <div class="slider">
+        <div class="slider-img"><img src="imgs/1.jpg"></div>
+        <div class="slider-img"><img src="imgs/2.jpg"></div>
+        <div class="slider-img"><img src="imgs/3.jpg"></div>
+        <div class="slider-img"><img src="imgs/4.jpg"></div>
+        <div class="slider-img"><img src="imgs/5.jpg"></div>
+        <div class="slider-img"><img src="imgs/6.jpg"></div>
+    </div>
+    <div class="slider-ctrl">
+        <span class="prev">上一张</span>
+        <span class="next">下一张</span>
+    </div>
+</div>
+
+<script src="animate.js"></script>
+<script>
+    var box_js=$("box_js");   //外部大盒子
+    var slider=box_js.children[0];   //图片盒子的父级
+    var sliderImg=slider.children;   //所有的图片
+    var slider_ctrl=box_js.children[1];   //底部导航盒子
+    var aSpan=slider_ctrl.children; //上一张 和  下一张;
+    var timer=null;
+
+
+    function init(){
+        //动态生成 inder
+        for(var i=0; i<sliderImg.length; i++)
+        {
+            //创建span
+            var sInder=document.createElement("span"); //创建 了 6次
+            //插入sInder
+            slider_ctrl.insertBefore(sInder,aSpan[1]);//插在“下一张”前面  父集.insertBefore(newchild,refchild)
+
+            sInder.setAttribute("class","inder");    //在创建的sInder中添加class（inder）
+
+            sliderImg[i].style.left= box_js.clientWidth + "px";   //所有图片都叠加在右边
+        }
+        sliderImg[0].style.left="0px"; //第一张图片出现在中央
+
+    }
+    init();
+
+    var aBtn=slider_ctrl.getElementsByTagName("span");
+    //获取所有span按钮
+    aBtn[1].className="inder cur";    //0为上一张
+    var key=0;
+    //点击事件
+    for(var i in aBtn)
+    {
+
+        aBtn[i].onclick=function(){
+          clearInterval(timer)
+            if (this.className == "prev")
+            {
+
+                animate(sliderImg[key],{left:box_js.clientWidth}); //先让第0张图片隐藏 到右边310
+                if(key==0){
+                    key=sliderImg.length;
+                    key--;
+                    key >= sliderImg.length ? key = 0 : key;
+                    sliderImg[key].style.left = -box_js.clientWidth + "px"; //让第1张图到左边边310
+                    animate(sliderImg[key], {left: 0});//在让第二张图片到0，显示
+                }
+                else {
+                    key--;
+                    key >= sliderImg.length ? key = 0 : key;
+                    sliderImg[key].style.left = -box_js.clientWidth + "px"; //让第1张图到左边边310
+                    animate(sliderImg[key], {left: 0});//在让第二张图片到0，显示
+                }
+                current();
+            }
+            else if(this.className == "next")
+            {
+
+                //下一张
+                animate(sliderImg[key],{left:-box_js.clientWidth}); //先让第一张图片隐藏 到-310
+                key++;
+                key >= sliderImg.length ? key = 0 : key;
+                sliderImg[key].style.left= box_js.clientWidth + "px"; //让第二张图到右边310
+                animate(sliderImg[key],{left:0});//在让第二张图片到0，显示
+                current();
+            }
+            else{
+                //alert(222)
+                for(var k=1;k<aBtn.length-1;k++){
+                    aBtn[k].className="inder";
+                }
+
+                this.className="inder cur"
+
+            }
+            play()
+        }
+    }
+    function play(){
+        timer=setInterval(function(){
+            animate(sliderImg[key],{left:-box_js.clientWidth}); //先让第一张图片隐藏 到-310
+            key++;
+            key >= sliderImg.length ? key = 0 : key;
+            sliderImg[key].style.left= box_js.clientWidth + "px"; //让第二张图到右边310
+            animate(sliderImg[key],{left:0})
+            current();
+        },2000)
+    }
+    play()
+        function current(){
+            for(var i=1;i<aBtn.length-1;i++){
+                aBtn[i].className="inder";
+            }
+            aBtn[key+1].className="inder cur"
+        }
+
+</script>
+</body>
+</html>
